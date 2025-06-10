@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "421622216426",
+    "project_id": "ami-invisible-551a1",
+    "storage_bucket": "ami-invisible-551a1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421622216426:android:613237eecce12613268993",
+        "android_client_info": {
+          "package_name": "com.example.ami_invisible_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvyd32rSoDh3AEIiFNLL5L0jP509Z_FpM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421622216426:android:4b6b8b60876ad967268993",
+        "android_client_info": {
+          "package_name": "com.example.ami_invisible_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "421622216426-9q7n3trvkt23luoe29f1ctlj1cbahthr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ami_invisible_app",
+            "certificate_hash": "938f2c737e40cabd3651599628bd94a70ae6f22f"
+          }
+        },
+        {
+          "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvyd32rSoDh3AEIiFNLL5L0jP509Z_FpM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
