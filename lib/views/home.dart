@@ -47,6 +47,9 @@ class _HomeState extends State<Home> {
     final error = adminProvider.error;
     final verifiedUsers = adminProvider.verifiedUsers;
     final totalVerifiedUsers = adminProvider.totalVerifiedUsers;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final isMobile = screenWidth < 600;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -104,21 +107,21 @@ class _HomeState extends State<Home> {
                 shrinkWrap: true,
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
-                childAspectRatio: 2.3,
+                childAspectRatio: isMobile ? 1.2 : 2.3,
                 physics: NeverScrollableScrollPhysics(),
                 children: [
                   _buildStatCard(Icons.person, totalVerifiedUsers.toString(), 'Utilisateurs',() {
                     Provider.of<AuthProvider>(context, listen: false).changeTab(1);
-                  },),
+                  },isMobile),
                   _buildStatCard(Icons.favorite, adminProvider.totalMatch.toString(), 'Matches',() {
 
-                  },),
+                  },isMobile),
                   _buildStatCard(Icons.attach_money, '${adminProvider.totalMatchAmountPaid.toStringAsFixed(0)} FCFA', 'Total Revenue',() {
 
-                  },),
+                  },isMobile),
                   _buildStatCard(Icons.favorite_border, adminProvider.totalMatchUnPaid.toString(), 'Matches Non Payé',() {
 
-                  },),
+                  },isMobile),
                 ],
               ),
               const SizedBox(height: 30),
@@ -190,7 +193,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildStatCard(IconData icon, String value, String label, VoidCallback onTap) {
+  Widget _buildStatCard(IconData icon, String value, String label, VoidCallback onTap, bool isMobile) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -198,12 +201,12 @@ class _HomeState extends State<Home> {
           gradient: AppTheme.primaryGradient,
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: EdgeInsets.all(20),
+        padding:isMobile ?EdgeInsets.symmetric(horizontal: 20,vertical: 10)  :EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: Colors.white, size: 36),
-            SizedBox(height: 10),
+            SizedBox(height: isMobile ? 4: 10),
             Text(
               value,
               style: TextStyle(

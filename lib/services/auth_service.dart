@@ -123,7 +123,7 @@ class AuthService {
     required String phone,
     required String password,
   }) async {
-    final url = Uri.parse('$BASE_URL/admin/login');
+    final url = Uri.parse('$BASE_URL/login');
     final response = await client.post(
       url,
       headers: {'Accept': 'application/json'},

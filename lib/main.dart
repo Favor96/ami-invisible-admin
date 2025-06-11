@@ -1,6 +1,7 @@
 import 'package:ami_invisible_admin/core/config/app_theme.dart';
 import 'package:ami_invisible_admin/providers/admin_provider.dart';
 import 'package:ami_invisible_admin/providers/auth_provider.dart';
+import 'package:ami_invisible_admin/providers/chat_provider.dart';
 import 'package:ami_invisible_admin/router.dart';
 import 'package:ami_invisible_admin/services/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,6 +25,7 @@ void main() async{
     providers: [
       ChangeNotifierProvider(create: (_) => AuthProvider()),
       ChangeNotifierProvider(create: (_) => AdminProvider()),
+      ChangeNotifierProvider(create: (_) => ChatProvider()),
       // Tu peux ajouter d'autres providers ici
     ],
     child: const MyApp(),

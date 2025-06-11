@@ -158,6 +158,7 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         _token = data['token'];
+        _userMap = data['admin'];
         _error = null;
         // await AuthService().registerFcmToken();
 
@@ -322,12 +323,9 @@ Future<void> fetchUser() async {
       final response = await AuthService().getUser();
 
       if (response.statusCode == 200) {
-        log("USER INF ${response.body}");
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        print("👤 Données utilisateur : $data");
-
-        // Tu stockes directement le Map si tu ne veux pas utiliser User
-        _userMap = data;
+        print("👤 Données utilisateur : ${data['admin']}");
+        _userMap = data['admin'];
       } else {
         _errorUser =
             "Erreur lors du chargement du profil : ${response.statusCode}";
@@ -347,9 +345,11 @@ Future<void> logout() async {
     notifyListeners();
 
     final token = await AuthStorage.getToken();
+    log("token $token");
     if (token != null) {
       final response =
           await _authService.logout();
+      log("t ${response.body}");
       if (response.statusCode == 200) {
         _token = null;
         _user = null;

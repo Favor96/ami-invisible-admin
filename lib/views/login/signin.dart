@@ -145,10 +145,10 @@ class _SigninState extends State<Signin> {
                             phone: fullPhone,
                             password: password,
                           );
-
-                          Navigator.of(context).pop(); // Fermer le loading
+                          await AuthService().registerFcmToken();
 
                           if (!success) {
+                            Navigator.of(context).pop(); // Fermer le loading
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -159,6 +159,7 @@ class _SigninState extends State<Signin> {
                           } else {
                             await authProvider.fetchUser();
                             await AuthService().registerFcmToken();
+                            Navigator.of(context).pop(); // Fermer le loading
 
                               context.goNamed(
                                   'layout');

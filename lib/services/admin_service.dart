@@ -30,4 +30,29 @@ class AdminService {
       },
     );
   }
+
+  Future<http.Response> getChatMessage(int messageId) async {
+    final token = await AuthStorage.getToken();
+    final url = Uri.parse('$BASE_URL/message/user/$messageId');
+    return await client.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+  }
+
+  Future<http.Response> getAllLikes(int id) async {
+    final token = await AuthStorage.getToken();
+    final url = Uri.parse('$BASE_URL/likes/all/${id}');
+
+    return await client.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+  }
 }
