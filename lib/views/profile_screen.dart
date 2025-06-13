@@ -35,25 +35,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const CircleAvatar(
                   radius: 30,
                   backgroundImage: AssetImage(
-                      'assets/img/avatar_fem.jpg'), // ou NetworkImage(...)
+                      'assets/img/logo_1024.png'), // ou NetworkImage(...)
                 ),
                 const SizedBox(width: 16),
-                // Column(
-                //   crossAxisAlignment: CrossAxisAlignment.start,
-                //   children: [
-                //     Text(
-                //         '${Provider
-                //             .of<AuthProvider>(context, listen: false)
-                //             .userMap!['nom']} ${Provider
-                //             .of<AuthProvider>(context, listen: false)
-                //             .userMap!['prenom']}',
-                //         style:
-                //         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                //     Text('${Provider
-                //         .of<AuthProvider>(context, listen: false)
-                //         .userMap!['profil']['age']} ans', style: TextStyle(color: Colors.grey)),
-                //   ],
-                // )
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        '${Provider
+                            .of<AuthProvider>(context, listen: false)
+                            .userMap!['name']} ',
+                        style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                )
               ],
             ),
             const SizedBox(height: 30),

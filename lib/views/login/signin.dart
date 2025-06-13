@@ -158,12 +158,9 @@ class _SigninState extends State<Signin> {
                             );
                           } else {
                             await authProvider.fetchUser();
-                            await AuthService().registerFcmToken();
                             Navigator.of(context).pop(); // Fermer le loading
-
                               context.goNamed(
                                   'layout');
-
                           }
                         },
 

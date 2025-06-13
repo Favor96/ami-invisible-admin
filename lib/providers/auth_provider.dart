@@ -11,9 +11,10 @@ class AuthProvider with ChangeNotifier {
   String? _token;
   Map<String, dynamic>? _user;
   String? _error;
-
+  int _notifications_unread = 0;
   bool get isLoading => _isLoading;
   String? get token => _token;
+  int get notifications_unread => _notifications_unread;
   Map<String, dynamic>? get user => _user;
   String? get error => _error;
   Map<String, String> _fieldErrors = {};
@@ -321,11 +322,13 @@ Future<void> fetchUser() async {
 
     try {
       final response = await AuthService().getUser();
+      log("Info ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         print("👤 Données utilisateur : ${data['admin']}");
         _userMap = data['admin'];
+        _notifications_unread = data['notifications_unread'];
       } else {
         _errorUser =
             "Erreur lors du chargement du profil : ${response.statusCode}";

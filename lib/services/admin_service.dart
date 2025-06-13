@@ -55,4 +55,17 @@ class AdminService {
       },
     );
   }
+
+  Future<http.Response> getPayement() async {
+    final token = await AuthStorage.getToken();
+    final url = Uri.parse('$BASE_URL/payement/list');
+
+    return await client.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+  }
 }

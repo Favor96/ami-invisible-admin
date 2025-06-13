@@ -19,7 +19,7 @@ class NotificationService {
     importance: Importance.high,
   );
 
-  /// ✅ Affiche une notification locale pure
+
   Future<void> showLocalNotification(
       {required String title, required String body}) async {
     await _localNotificationsPlugin.show(

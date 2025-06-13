@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:ami_invisible_admin/providers/admin_provider.dart';
+import 'package:ami_invisible_admin/providers/auth_provider.dart';
 import 'package:ami_invisible_admin/services/chat_service.dart';
 import 'package:ami_invisible_admin/services/reverb_service.dart';
 import 'package:file_picker/file_picker.dart';
@@ -209,7 +211,7 @@ class ChatProvider with ChangeNotifier {
 
   final ReverbService _reverbService = ReverbService();
 
-  Future<void> connectToSocket(String channelName,) async {
+  Future<void> connectToSocket(String channelName,AdminProvider adminProvider) async {
     await _reverbService.connect();
     await _reverbService.subscribeToPrivateChannel(channelName);
 
@@ -250,7 +252,7 @@ class ChatProvider with ChangeNotifier {
             'created_at': msg['created_at'],
           };
 
-          //   likeProvider.reorderUserOnNewMessage(msg['sender_id'], message, sentByMe: false);
+          adminProvider.reorderUserOnNewMessage(msg['sender_id'], message, sentByMe: false);
           //
           //   // NotificationService().showLocalNotification(
           //   //   title: "Nouveau message",

@@ -25,6 +25,20 @@ class _MessageScreenState extends State<MessageScreen> {
   final TextEditingController searchCtrl = TextEditingController();
   String searchText = '';
   bool selectUser = false ;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      final userMap =
+      await Provider.of<AuthProvider>(context, listen: false).userMap;
+      final userId = userMap!['user_id'];
+      final channelName = 'private-chat.$userId';
+      await Provider.of<ChatProvider>(context, listen: false)
+          .connectToSocket(channelName, Provider.of<AdminProvider>(context, listen: false));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

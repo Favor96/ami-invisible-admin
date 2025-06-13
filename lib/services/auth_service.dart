@@ -207,7 +207,7 @@ class AuthService {
 
   Future<http.Response> getUser() async {
     final token = await AuthStorage.getToken();
-    final url = Uri.parse('$BASE_URL/admin/info');
+    final url = Uri.parse('$BASE_URL/info');
     return await client.get(
       url,
       headers: {
@@ -230,7 +230,7 @@ class AuthService {
 
   Future<http.Response> getUserNotification() async {
     final token = await AuthStorage.getToken();
-    final url = Uri.parse('$BASE_URL/user/notifications');
+    final url = Uri.parse('$BASE_URL/notifications');
     return await client.get(
       url,
       headers: {

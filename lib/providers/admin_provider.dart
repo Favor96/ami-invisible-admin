@@ -10,6 +10,7 @@ class AdminProvider with ChangeNotifier {
   List<dynamic> _verifiedUsers = [];
   int _totalVerifiedUsers = 0;
   List<dynamic> _matchs = [];
+  List<dynamic> _payementList = [];
   int _totalMatch = 0;
   int _totalMatchUnPaid = 0;
   int _totalMatchAmountPaid = 0;
@@ -19,6 +20,7 @@ class AdminProvider with ChangeNotifier {
   List<dynamic> get verifiedUsers => _verifiedUsers;
   int get totalVerifiedUsers => _totalVerifiedUsers;
   List<dynamic> get matchs => _matchs;
+  List<dynamic> get payements => _payementList;
   int get totalMatch => _totalMatch;
   int get totalMatchUnPaid => _totalMatchUnPaid;
   int get totalMatchAmountPaid => _totalMatchAmountPaid;
@@ -43,6 +45,30 @@ class AdminProvider with ChangeNotifier {
         final Map<String, dynamic> data = jsonDecode(response.body);
         _verifiedUsers = data['users'];
         _totalVerifiedUsers = data['total_verified_users'];
+
+      } else {
+        _error = "Erreur ${response.body}";
+      }
+    } catch (e) {
+      _error = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> fetchPayements() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await adminService.getPayement();
+      log("response b ${response.body}");
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _error = null;
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        _payementList = data['data'];
 
       } else {
         _error = "Erreur ${response.body}";

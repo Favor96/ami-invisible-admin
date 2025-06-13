@@ -1,5 +1,9 @@
+import 'dart:developer';
+
+import 'package:ami_invisible_admin/providers/auth_provider.dart';
 import 'package:ami_invisible_admin/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 
@@ -35,6 +39,8 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (isValid) {
+      log("Oui");
+      await Provider.of<AuthProvider>(context, listen: false).fetchUser();
       context.goNamed('layout'); // Redirige vers l'accueil
     } else {
       context.goNamed('signin'); // Redirige vers la connexion

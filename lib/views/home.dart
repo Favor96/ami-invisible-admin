@@ -1,9 +1,10 @@
 import 'package:ami_invisible_admin/core/config/app_theme.dart';
 import 'package:ami_invisible_admin/providers/admin_provider.dart';
 import 'package:ami_invisible_admin/providers/auth_provider.dart';
+import 'package:ami_invisible_admin/providers/notification_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:go_router/go_router.dart';
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -36,6 +37,7 @@ class _HomeState extends State<Home> {
     Future.microtask(() {
       Provider.of<AdminProvider>(context, listen: false).fetchVerifiedUsers();
       Provider.of<AdminProvider>(context, listen: false).fetchMatchs();
+      Provider.of<NotificationProvider>(context, listen: false).fetchNotifications();
     });
   }
 
@@ -75,9 +77,12 @@ class _HomeState extends State<Home> {
                   Stack(
                     alignment: Alignment.topRight,
                     children: [
-                      Icon(
-                        Icons.notifications_none,
-                        size: 30,
+                      IconButton(
+                        icon: Icon(Icons.notifications_none,
+                          size: 30,),
+                        onPressed:  (() {
+                          context.pushNamed('notification');
+                        }),
                       ),
                       Positioned(
                         right: 0,
@@ -89,7 +94,7 @@ class _HomeState extends State<Home> {
                             shape: BoxShape.circle,
                           ),
                           child: Text(
-                            '3', // Remplace par ta variable si nécessaire
+                            Provider.of<AuthProvider>(context, listen: false).notifications_unread > 0 ? Provider.of<AuthProvider>(context, listen: false).notifications_unread.toString() : '' , // Remplace par ta variable si nécessaire
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -115,9 +120,10 @@ class _HomeState extends State<Home> {
                   },isMobile),
                   _buildStatCard(Icons.favorite, adminProvider.totalMatch.toString(), 'Matches',() {
 
+
                   },isMobile),
                   _buildStatCard(Icons.attach_money, '${adminProvider.totalMatchAmountPaid.toStringAsFixed(0)} FCFA', 'Total Revenue',() {
-
+                    context.pushNamed('payement');
                   },isMobile),
                   _buildStatCard(Icons.favorite_border, adminProvider.totalMatchUnPaid.toString(), 'Matches Non Payé',() {
 
@@ -134,56 +140,76 @@ class _HomeState extends State<Home> {
               ),
               const SizedBox(height: 10),
               Expanded(
-                child: ListView.builder(
-                  itemCount: recentActivities.length,
-                  itemBuilder: (context, index) {
-                    final activity = recentActivities[index];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Contenu textuel (titre + description)
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Nouveau paiement',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${activity['user1']} a payé pour son match avec ${activity['user2']}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[800],
-                                  ),
-                                ),
-                              ],
-                            ),
+                child: Consumer<NotificationProvider>(
+                  builder: (context, provider, child) {
+                    if (provider.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (provider.error != null) {
+                      return Center(child: Text(provider.error!));
+                    }
+
+                    final notifications = provider.notifications;
+
+                    if (notifications.isEmpty) {
+                      return const Center(child: Text('Pas d\'activité récente.'));
+                    }
+
+                    return ListView.builder(
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) {
+                        final notif = notifications[index];
+
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          // Date/heure à droite
-                          Text(
-                            activity['time']!,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Contenu textuel (titre + description)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      notif.title ?? 'Nouveau paiement',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${notif.body}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Date/heure à droite
+                              Text(
+                                notif.createdAt.toString(), // par ex. "12 juin 2025"
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     );
                   },
-                ),
+                )
+
 
               ),
             ],
