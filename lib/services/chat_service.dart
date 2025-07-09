@@ -113,7 +113,7 @@ class ChatService {
   // Nombre d'expéditeurs avec messages non lus
   Future<http.Response> getUnreadSendersCount() async {
     final token = await AuthStorage.getToken();
-    final url = Uri.parse('$BASE_URL/messages/unread-senders-count');
+    final url = Uri.parse('$BASE_URL/messages/unread-senders');
     return await client.get(
       url,
       headers: {

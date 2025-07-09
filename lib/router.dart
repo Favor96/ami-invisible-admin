@@ -1,5 +1,6 @@
 import 'package:ami_invisible_admin/views/layout_screen.dart';
 import 'package:ami_invisible_admin/views/login/signin.dart';
+import 'package:ami_invisible_admin/views/message_screen.dart';
 import 'package:ami_invisible_admin/views/notification_screen.dart';
 import 'package:ami_invisible_admin/views/payement_screen.dart';
 import 'package:ami_invisible_admin/views/splash_screen.dart';
@@ -31,5 +32,9 @@ final GoRouter router = GoRouter(
         path: '/payement',
         builder: (context, state) =>  PayementScreen(),
         name: 'payement'),
+    GoRoute(
+        path: '/message',
+        builder: (context, state) =>  MessageScreen(),
+        name: 'message'),
   ],
 );

@@ -1,5 +1,6 @@
 import 'package:ami_invisible_admin/core/config/app_theme.dart';
 import 'package:ami_invisible_admin/providers/auth_provider.dart';
+import 'package:ami_invisible_admin/providers/chat_provider.dart';
 import 'package:ami_invisible_admin/views/home.dart';
 import 'package:ami_invisible_admin/views/message_screen.dart';
 import 'package:ami_invisible_admin/views/profile_screen.dart';
@@ -31,6 +32,11 @@ class LayoutScreenState extends State<LayoutScreen> {
   @override
   void initState() {
     super.initState();
+
+    Future.microtask(() {
+      Provider.of<ChatProvider>(context, listen: false)
+          .fetchUnreadSendersCount();
+    });
 
   }
 
@@ -71,11 +77,11 @@ class LayoutScreenState extends State<LayoutScreen> {
     BottomNavigationBarItem _buildNavItem(BuildContext context,
       IconData icon, String label, int index) {
     final bool isSelected = Provider.of<AuthProvider>(context,listen: true).selectedIndex == index;
-    final int unreadCount =0;
+    final int unreadCount =Provider.of<ChatProvider>(context).unreadSendersCount;
 
     Widget iconWidget;
 
-    if (index == 2) {
+    if (index == 1) {
       iconWidget = Stack(
         clipBehavior: Clip.none,
         children: [

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:ami_invisible_admin/providers/admin_provider.dart';
 import 'package:ami_invisible_admin/providers/auth_provider.dart';
@@ -33,7 +34,6 @@ class ChatProvider with ChangeNotifier {
   void setCurrentOpenUserId(int? userId) {
     _currentOpenUserId = userId;
   }
-
 
 
   void _setLoading(bool value) {
@@ -158,6 +158,7 @@ class ChatProvider with ChangeNotifier {
     _error = null;
     try {
       final response = await _chatService.getUnreadSendersCount();
+      log("Unread ${response.body}");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         _unreadSendersCount =

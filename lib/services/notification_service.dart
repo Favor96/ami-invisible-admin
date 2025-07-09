@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:ami_invisible_admin/providers/auth_provider.dart';
+import 'package:ami_invisible_admin/router.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
@@ -34,62 +39,99 @@ class NotificationService {
           priority: Priority.high,
         ),
       ),
-      payload: 'local', // 👈 On indique que c'est une notification locale
+      payload: 'local',
     );
   }
 
-  /// ✅ Initialisation du service de notification
+
   Future<void> init() async {
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    AndroidInitializationSettings('@mipmap/ic_launcher');
 
     final InitializationSettings settings =
-        InitializationSettings(android: androidSettings);
+    InitializationSettings(android: androidSettings);
 
-    // ✅ Initialisation du plugin local avec gestion du payload
     await _localNotificationsPlugin.initialize(
       settings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         final payload = response.payload;
-
-        if (payload == 'firebase') {
-          print("🔥 Notification reçue depuis Firebase");
-        } else if (payload == 'local') {
-          print("📱 Notification locale manuelle");
-        } else {
-          print("🔔 Notification inconnue ou sans payload");
+        if (payload != null && payload.isNotEmpty) {
+          try {
+            final data = jsonDecode(payload);
+            if (data is Map && data.containsKey('sender_id')) {
+              final senderId = data['sender_id'].toString();
+              _navigateToMessagePage(senderId);
+            }
+          } catch (e) {
+            print("Erreur de parsing du payload : $e");
+          }
         }
       },
     );
 
-    // ✅ Création du canal (Android 8+)
     await _localNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_channel);
 
-    // ✅ Écoute des messages reçus quand l'app est en foreground
+    // ✅ App en foreground
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+
+    // ✅ App en background (notification cliquée)
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      final data = message.data;
+      if (data.containsKey('sender_id')) {
+        final senderId = data['sender_id'].toString();
+        _navigateToMessagePage(senderId);
+      }
+    });
+
+    // ✅ App terminée (notification cliquée au lancement)
+    RemoteMessage? initialMessage =
+    await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      final data = initialMessage.data;
+      if (data.containsKey('sender_id')) {
+        final senderId = data['sender_id'].toString();
+        _navigateToMessagePage(senderId);
+      }
+    }
   }
+
 
   /// ✅ Gestion d’un message Firebase en foreground
   void _handleForegroundMessage(RemoteMessage message) {
     final notification = message.notification;
+    final data = message.data;
+
     if (notification != null) {
+      // 👇 Encodage JSON du payload data
+      final String jsonPayload = jsonEncode(data);
+
       _localNotificationsPlugin.show(
         notification.hashCode,
         notification.title,
         notification.body,
         const NotificationDetails(
           android: AndroidNotificationDetails(
-            'fcm_channel', // channel ID
-            'Messages', // channel name
+            'fcm_channel',
+            'Messages',
             importance: Importance.max,
             priority: Priority.high,
           ),
         ),
-        payload: 'firebase', // 👈 On indique que ça vient de Firebase
+        payload: jsonPayload, // 👈 On envoie les données en JSON
       );
     }
+  }
+
+  void _navigateToMessagePage(String senderId) {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        final controller = Provider.of<AuthProvider>(context, listen: false);
+        controller.changeTab(2); // Onglet "Messages"
+      }
+    });
   }
 }
