@@ -32,7 +32,6 @@ class _MessageScreenState extends State<MessageScreen> {
     Future.microtask(() async {
       final userMap =
       await Provider.of<AuthProvider>(context, listen: false).userMap;
-      await Provider.of<AuthProvider>(context, listen: false).fetchUser();
       final userId = userMap!['user_id'];
       print("user $userId");
       final channelName = 'private-chat.$userId';

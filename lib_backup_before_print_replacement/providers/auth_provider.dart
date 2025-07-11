@@ -322,7 +322,7 @@ Future<void> fetchUser() async {
 
     try {
       final response = await AuthService().getUser();
-      log("Info admin ${response.body}");
+      log("Info ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
