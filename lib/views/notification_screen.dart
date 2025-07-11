@@ -84,7 +84,7 @@ class _NotificationUserScreenState extends State<NotificationUserScreen> {
                 title: Text(notif.title),
                 subtitle: Text(notif.body),
                 trailing: Text(
-                  '${notif.createdAt.toLocal()}'.split('.')[0],
+                  '${notif.created_at_formatted.toLocal()}'.split('.')[0],
                   style: const TextStyle(fontSize: 12),
                 ),
               ),

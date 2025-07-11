@@ -6,14 +6,14 @@ class UserNotification {
   final String body;
   final bool is_read;
   final Map<String, dynamic> data;
-  final DateTime createdAt;
+  final DateTime created_at_formatted;
 
   UserNotification({
     required this.id,
     required this.title,
     required this.body,
     required this.data,
-    required this.createdAt,
+    required this.created_at_formatted,
     required this.is_read
   });
 
@@ -25,7 +25,7 @@ class UserNotification {
       data: json['data'] is String
           ? Map<String, dynamic>.from(jsonDecode(json['data']))
           : Map<String, dynamic>.from(json['data']),
-      createdAt: DateTime.parse(json['created_at']),
+      created_at_formatted: DateTime.parse(json['created_at']),
         is_read: json['is_read']
     );
   }

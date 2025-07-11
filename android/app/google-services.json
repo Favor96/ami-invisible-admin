@@ -43,13 +43,71 @@
       },
       "oauth_client": [
         {
+          "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvyd32rSoDh3AEIiFNLL5L0jP509Z_FpM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421622216426:android:0612b14f65d7443c268993",
+        "android_client_info": {
+          "package_name": "com.favor.amiinvisible"
+        }
+      },
+      "oauth_client": [
+        {
           "client_id": "421622216426-9q7n3trvkt23luoe29f1ctlj1cbahthr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.ami_invisible_app",
-            "certificate_hash": "938f2c737e40cabd3651599628bd94a70ae6f22f"
+            "package_name": "com.favor.amiinvisible",
+            "certificate_hash": "97fc71a763a5f8a73d553bbb77f73a82395c1986"
           }
         },
+        {
+          "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvyd32rSoDh3AEIiFNLL5L0jP509Z_FpM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421622216426:android:14c9b715d5d18dc6268993",
+        "android_client_info": {
+          "package_name": "com.favor.amiinvisibleadmin"
+        }
+      },
+      "oauth_client": [
         {
           "client_id": "421622216426-8kghekodfdhgv9ua1j0cbbjtk4u9og8t.apps.googleusercontent.com",
           "client_type": 3

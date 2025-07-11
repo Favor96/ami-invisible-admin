@@ -196,7 +196,7 @@ class _HomeState extends State<Home> {
                               ),
                               // Date/heure à droite
                               Text(
-                                notif.createdAt.toString(), // par ex. "12 juin 2025"
+                                '${notif.created_at_formatted.toLocal()}'.split('.')[0], // par ex. "12 juin 2025"
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 12,

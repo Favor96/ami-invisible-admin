@@ -1,4 +1,4 @@
-package com.example.ami_invisible_admin
+package com.favor.amiinvisibleadmin
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -33,6 +33,7 @@ class _MessageScreenState extends State<MessageScreen> {
       final userMap =
       await Provider.of<AuthProvider>(context, listen: false).userMap;
       final userId = userMap!['user_id'];
+      print("user $userId");
       final channelName = 'private-chat.$userId';
       await Provider.of<ChatProvider>(context, listen: false)
           .connectToSocket(channelName, Provider.of<AdminProvider>(context, listen: false));
@@ -133,12 +134,17 @@ class _MessageScreenState extends State<MessageScreen> {
                           itemCount: likedUsers.length,
                           itemBuilder: (context, index) {
                             final user = likedUsers[index];
-                            String name = (user['nom'] != null &&
-                                user['prenom'] != null &&
-                                user['nom'].isNotEmpty &&
-                                user['prenom'].isNotEmpty)
-                                ? '${user['nom']} ${user['prenom']}'
-                                : (user['phone'] ?? '');
+                            String name;
+                            if (user['nom']?.toString().trim().isNotEmpty == true &&
+                                user['prenom']?.toString().trim().isNotEmpty == true) {
+                              name = '${user['nom']} ${user['prenom']}';
+                            } else if (user['prenom']?.toString().trim().isNotEmpty == true) {
+                              name = user['prenom'];
+                            } else if (user['nom']?.toString().trim().isNotEmpty == true) {
+                              name = user['nom'];
+                            } else {
+                              name = '';
+                            }
                             return GestureDetector(
                               onTap: () {
                                 final chatProvider = Provider.of<ChatProvider>(

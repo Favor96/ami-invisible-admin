@@ -32,6 +32,11 @@ class ReverbService {
 
         try {
           final data = jsonDecode(message);
+          if (data['event'] == 'pusher:ping') {
+            final pong = jsonEncode({'event': 'pusher:pong', 'data': {}});
+            _channel.sink.add(pong);
+            print("📡 Pong envoyé en réponse au ping");
+          }
           if (data['event'] == 'pusher:connection_established') {
             _socketId = jsonDecode(data['data'])['socket_id'];
             print('Connected with Socket ID: $_socketId');
@@ -83,8 +88,9 @@ class ReverbService {
   }
 
   Future<String> _getAuthToken(String channelName, String token) async {
-    final uri = Uri.parse('$BASE_URL/broadcasting/auth');
-
+    final uri = Uri.parse('$BASE_URL_2/broadcasting/auth');
+print("sok $_socketId");
+print("ch $channelName");
     final response = await http.post(
       uri,
       headers: {
