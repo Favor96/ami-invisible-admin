@@ -1,3 +1,4 @@
+import 'package:ami_invisible_admin/views/interaction_screen.dart';
 import 'package:ami_invisible_admin/views/layout_screen.dart';
 import 'package:ami_invisible_admin/views/login/signin.dart';
 import 'package:ami_invisible_admin/views/message_screen.dart';
@@ -28,6 +29,21 @@ final GoRouter router = GoRouter(
         path: '/layout',
         builder: (context, state) => const LayoutScreen(),
         name: 'layout'),
+    GoRoute(
+      path: '/interactions',
+      name: 'interactions',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final interactions = extra['interactions'] as List<dynamic>;
+        final username = extra['username'] as String;
+        final id = extra['id'] as int;
+        return InteractionsPage(
+          interactions: interactions,
+          username: username,
+          id: id,
+        );
+      },
+    ),
     GoRoute(
         path: '/payement',
         builder: (context, state) =>  PayementScreen(),

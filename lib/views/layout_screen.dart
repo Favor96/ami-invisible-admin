@@ -37,7 +37,6 @@ class LayoutScreenState extends State<LayoutScreen> {
       Provider.of<ChatProvider>(context, listen: false)
           .fetchUnreadSendersCount();
     });
-
   }
 
   @override

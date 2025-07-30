@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:ami_invisible_admin/services/constant.dart';
 import 'package:ami_invisible_admin/utils/auth_storage.dart';
@@ -127,6 +128,18 @@ class ChatService {
   Future<http.Response> getChatMessage(int messageId) async {
     final token = await AuthStorage.getToken();
     final url = Uri.parse('$BASE_URL/message/user/$messageId');
+    return await client.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+  }
+
+  Future<http.Response> getChatMessageBetween(int fromId,int toId) async {
+    final token = await AuthStorage.getToken();
+    final url = Uri.parse('$BASE_URL/message/between/$fromId/$toId');
     return await client.get(
       url,
       headers: {

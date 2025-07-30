@@ -13,17 +13,21 @@ class ChatProvider with ChangeNotifier {
 
   bool _isLoading = false;
   String? _error;
+  String? _errorBetween;
 
   List<dynamic> _receivedMessages = [];
   List<dynamic> _sentMessages = [];
   int _unreadSendersCount = 0;
   Map<String, dynamic>? _chatMessage;
   List<Map<String,dynamic>>? _chatAllMessage;
+  List<Map<String,dynamic>>? _chatAllMessageBetween;
   List<Map<String,dynamic>>? get chatAllMessage => _chatAllMessage;
+  List<Map<String,dynamic>>? get chatAllMessageBetween => _chatAllMessageBetween;
 
 
   bool get isLoading => _isLoading;
   String? get error => _error;
+  String? get errorBetween => _errorBetween;
   List<dynamic> get receivedMessages => _receivedMessages;
   List<dynamic> get sentMessages => _sentMessages;
   int get unreadSendersCount => _unreadSendersCount;
@@ -204,12 +208,41 @@ class ChatProvider with ChangeNotifier {
     _setLoading(false);
   }
 
+  Future<void> fetchChatMessageBetweenTwoUser(int fromUserId, int toReceiverId) async {
+    _setLoading(true);
+    _errorBetween = null;
+    try {
+      final response = await _chatService.getChatMessageBetween(fromUserId, toReceiverId);
+
+      if (response.statusCode == 200) {
+
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final List<dynamic> messageList = responseData['message'] ?? [];
+
+        _chatAllMessageBetween = messageList
+            .map<Map<String, dynamic>>((item) => Map<String, dynamic>.from(item))
+            .toList();
+        notifyListeners();
+      } else {
+        _errorBetween = "Erreur ${response.statusCode} lors du chargement du message";
+      }
+    } catch (e) {
+      _errorBetween = "Exception: $e";
+    }
+    _setLoading(false);
+  }
+
+
+  void clearMessagesBetween() {
+    _chatAllMessageBetween = [];
+    _errorBetween = null;
+    notifyListeners();
+  }
   void clearMessages() {
     _chatAllMessage = [];
     _error = null;
     notifyListeners();
   }
-
   final ReverbService _reverbService = ReverbService();
 
   Future<void> connectToSocket(String channelName,AdminProvider adminProvider) async {

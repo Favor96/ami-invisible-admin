@@ -5,7 +5,6 @@ import 'package:ami_invisible_admin/core/config/text_style.dart';
 import 'package:ami_invisible_admin/providers/admin_provider.dart';
 import 'package:ami_invisible_admin/providers/auth_provider.dart';
 import 'package:ami_invisible_admin/providers/chat_provider.dart';
-import 'package:ami_invisible_admin/views/interaction_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -13,15 +12,23 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-class MessageScreen extends StatefulWidget {
-  const MessageScreen({super.key});
+class InteractionsPage extends StatefulWidget {
+  final List<dynamic> interactions;
+  final String username;
+  final int id;
+  const InteractionsPage({
+    super.key,
+    required this.interactions,
+    required this.username,
+    required this.id
+  });
 
   @override
-  State<MessageScreen> createState() => _MessageScreenState();
+  State<InteractionsPage> createState() => _InteractionPageState();
 }
 
-class _MessageScreenState extends State<MessageScreen> {
-  int _currentBottomNavIndex = 1;
+
+class _InteractionPageState extends State<InteractionsPage> {
   final ScrollController _scrollController = ScrollController();
   bool _showSearch = false;
   final TextEditingController searchCtrl = TextEditingController();
@@ -31,162 +38,164 @@ class _MessageScreenState extends State<MessageScreen> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white, // Barre de statut blanche
+      statusBarIconBrightness: Brightness.dark, // Icônes foncées
+      systemNavigationBarColor: const Color(0xFFC4C4C4), // Barre de navigation blanche
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ));
     Future.microtask(() async {
       final userMap =
       await Provider.of<AuthProvider>(context, listen: false).userMap;
       await Provider.of<AuthProvider>(context, listen: false).fetchUser();
       final userId = userMap!['user_id'];
-      print("user $userId");
-      final channelName = 'private-chat.$userId';
-      await Provider.of<ChatProvider>(context, listen: false)
-          .connectToSocket(channelName, Provider.of<AdminProvider>(context, listen: false));
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                const Row(
-                  children: [
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Messages',
-                      style: AppTextStyles.h1, // Ton style personnalisé
-                    ),
-                  ],
-                ),
-                if (_showSearch)
-                  TextField(
-                    controller: searchCtrl,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      hintText: "Rechercher",
-                      hintStyle: const TextStyle(fontSize: 14, color: Colors.black),
-                      prefixIcon:
-                      const Icon(Icons.search, color: AppTheme.textColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50),
-                        borderSide:
-                        const BorderSide(color: Color(0xFFADAFBB), width: 1.5),
+    return SafeArea(
+      child: Scaffold(
+        body:  Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                   Row(
+                    children: [
+                      const SizedBox(height: 10),
+                       Text(
+                        'Discussion de ${widget.username}',
+                        style: AppTextStyles.h4Bold, // Ton style personnalisé
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50),
-                        borderSide:
-                        const BorderSide(color: Color(0xFFADAFBB), width: 2.0),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50),
-                        borderSide:
-                        const BorderSide(color: Color(0xFFADAFBB), width: 0),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        searchText = value.toLowerCase();
-                      });
-                    },
+                    ],
                   ),
-                Expanded(
-                  child: Consumer<AdminProvider>(
-                    builder: (context, likeProvider, child) {
-                      if (likeProvider.isLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (likeProvider.error != null) {
-                        return Center(child: Text(likeProvider.error!));
-                      }
-
-                      final likedUsers = likeProvider.verifiedUsers.where((user) {
-                        final name = user['nom']?.toLowerCase() ?? '';
-                        return name.contains(searchText);
-                      }).toList();
-                      log("LIKED $likedUsers");
-
-                      if (likedUsers.isEmpty) {
-                        return const Center(child: Text("Aucun utilisateur liké."));
-                      }
-
-                      return NotificationListener<UserScrollNotification>(
-                        onNotification: (notification) {
-                          if (notification.direction == ScrollDirection.forward) {
-                            if (!_showSearch) {
-                              setState(() {
-                                _showSearch = true;
-                              });
-                            }
-                          } else if (notification.direction ==
-                              ScrollDirection.reverse) {
-                            if (_showSearch) {
-                              setState(() {
-                                _showSearch = false;
-                              });
-                            }
-                          }
-                          return true;
-                        },
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: likedUsers.length,
-                          itemBuilder: (context, index) {
-                            final user = likedUsers[index];
-                            String name;
-                            if (user['nom']?.toString().trim().isNotEmpty == true &&
-                                user['prenom']?.toString().trim().isNotEmpty == true) {
-                              name = '${user['nom']} ${user['prenom']}';
-                            } else if (user['prenom']?.toString().trim().isNotEmpty == true) {
-                              name = user['prenom'];
-                            } else if (user['nom']?.toString().trim().isNotEmpty == true) {
-                              name = user['nom'];
-                            } else {
-                              name = '';
-                            }
-                            return GestureDetector(
-                              onTap: () {
-                                final chatProvider = Provider.of<ChatProvider>(
-                                    context,
-                                    listen: false);
-                                chatProvider.setCurrentOpenUserId(user['id']);
-                                if (user['unread_messages_count'] > 0) {
-                                  chatProvider.markAllMessageAsRead(user['id']);
-                                }
-                                if (chatProvider.unreadSendersCount > 0 && user['unread_messages_count'] > 0) {
-                                  chatProvider.decrementUnreadSendersCount();
-                                }
-                                setState(() {
-                                  selectUser = true;
-                                  likedUsers[index]['unread_messages_count'] = 0;
-                                });
-                                _showChatModal(context, user);
-
-                              },
-
-                              child: messageItem(
-                                  name: name,
-                                  lastMessage: user['last_message'] == null ?'':user['last_message']['content'] == null ? "Photo" : user['last_message']['content'],
-                                  time: user['last_message'] == null ?'': extractHour(
-                                      user['last_message']['created_at']),
-                                  isOnline: false,
-                                  unreadCount: user['unread_messages_count'],
-                                  isMe: user['last_message_sent_by_me']),
-
-                            );
-                          },
+                  if (_showSearch)
+                    TextField(
+                      controller: searchCtrl,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                        hintText: "Rechercher",
+                        hintStyle: const TextStyle(fontSize: 14, color: Colors.black),
+                        prefixIcon:
+                        const Icon(Icons.search, color: AppTheme.textColor),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50),
+                          borderSide:
+                          const BorderSide(color: Color(0xFFADAFBB), width: 1.5),
                         ),
-                      );
-                    },
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50),
+                          borderSide:
+                          const BorderSide(color: Color(0xFFADAFBB), width: 2.0),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50),
+                          borderSide:
+                          const BorderSide(color: Color(0xFFADAFBB), width: 0),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          searchText = value.toLowerCase();
+                        });
+                      },
+                    ),
+                  Expanded(
+                    child: Consumer<AdminProvider>(
+                      builder: (context, likeProvider, child) {
+                        if (likeProvider.isLoading) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+      
+                        if (likeProvider.error != null) {
+                          return Center(child: Text(likeProvider.error!));
+                        }
+      
+                        final likedUsers = widget.interactions.where((user) {
+                          final name = user['nom']?.toLowerCase() ?? '';
+                          return name.contains(searchText);
+                        }).toList();
+                        log("LIKED $likedUsers");
+      
+                        if (likedUsers.isEmpty) {
+                          return const Center(child: Text("Aucun utilisateur liké."));
+                        }
+      
+                        return NotificationListener<UserScrollNotification>(
+                          onNotification: (notification) {
+                            if (notification.direction == ScrollDirection.forward) {
+                              if (!_showSearch) {
+                                setState(() {
+                                  _showSearch = true;
+                                });
+                              }
+                            } else if (notification.direction ==
+                                ScrollDirection.reverse) {
+                              if (_showSearch) {
+                                setState(() {
+                                  _showSearch = false;
+                                });
+                              }
+                            }
+                            return true;
+                          },
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: likedUsers.length,
+                            itemBuilder: (context, index) {
+                              final user = likedUsers[index];
+                              String name;
+                              if (user['nom']?.toString().trim().isNotEmpty == true &&
+                                  user['prenom']?.toString().trim().isNotEmpty == true) {
+                                name = '${user['nom']} ${user['prenom']}';
+                              } else if (user['prenom']?.toString().trim().isNotEmpty == true) {
+                                name = user['prenom'];
+                              } else if (user['nom']?.toString().trim().isNotEmpty == true) {
+                                name = user['nom'];
+                              } else {
+                                name = '';
+                              }
+                              return GestureDetector(
+                                onTap: () {
+                                  final chatProvider = Provider.of<ChatProvider>(
+                                      context,
+                                      listen: false);
+                                  chatProvider.setCurrentOpenUserId(user['id']);
+                                  if (user['unread_messages_count'] > 0) {
+                                    chatProvider.markAllMessageAsRead(user['id']);
+                                  }
+                                  if (chatProvider.unreadSendersCount > 0 && user['unread_messages_count'] > 0) {
+                                    chatProvider.decrementUnreadSendersCount();
+                                  }
+                                  setState(() {
+                                    selectUser = true;
+                                    likedUsers[index]['unread_messages_count'] = 0;
+                                  });
+                                  _showChatModal(context, user);
+      
+                                },
+      
+                                child: messageItem(
+                                    name: name,
+                                    lastMessage: user['last_message'] == null ?'':user['last_message']['content'] == null ? "Photo" : user['last_message']['content'],
+                                    time: user['last_message'] == null ?'': extractHour(
+                                        user['last_message']['created_at']),
+                                    isOnline: false,
+                                    isMe: user['last_message_sent_by_me']),
+      
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-          )),
+                ],
+              ),
+            )
+      ),
     );
   }
 
@@ -402,8 +411,6 @@ class _MessageScreenState extends State<MessageScreen> {
                           ],
                         ),
                       const SizedBox(height: 20),
-
-
                       // Centre d'intérêt (comme avant)
                       Row(
                         children: [
@@ -459,10 +466,11 @@ class _MessageScreenState extends State<MessageScreen> {
     );
   }
 
+
   void _showChatModal(BuildContext parent, Map<String, dynamic> user) async {
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    chatProvider.clearMessages();
-    chatProvider.fetchChatMessage(user['id']);
+    chatProvider.clearMessagesBetween();
+    chatProvider.fetchChatMessageBetweenTwoUser(user['id'],widget.id);
     final TextEditingController controller = TextEditingController();
     final ScrollController _scrollController = ScrollController();
     void scrollToBottom() {
@@ -507,8 +515,8 @@ class _MessageScreenState extends State<MessageScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                ' ${user['nom']} ${user['prenom']}',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                '${user['nom']} ${user['prenom']} -> ${widget.username}',
+                                style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 14),
                               ),
                               const Text(
                                 'En ligne',
@@ -517,20 +525,6 @@ class _MessageScreenState extends State<MessageScreen> {
                             ],
                           ),
                           Spacer(),
-                          IconButton(
-                            icon: const Icon(Icons.group, color: Colors.blue),
-                            tooltip: "Voir ses conversations",
-                            onPressed: () {
-                              context.pushNamed(
-                                'interactions',
-                                extra: {
-                                  'interactions' : user["interactions"],
-                                  'username': "${user['nom']} ${user['prenom']}",
-                                  'id' : user["id"]
-                                }, // une List<Map<String, dynamic>>
-                              );
-                            },
-                          ),
 
                           IconButton(
                             icon:  Icon(Icons.info, color: AppTheme.primaryColor),
@@ -539,6 +533,7 @@ class _MessageScreenState extends State<MessageScreen> {
                               showModal(context,user);
                             },
                           ),
+
                         ],
                       ),
                       centerTitle: false,
@@ -551,7 +546,7 @@ class _MessageScreenState extends State<MessageScreen> {
                           if(selectUser && provider.isLoading){
                             return Container();
                           }
-                          final messages = provider.chatAllMessage ?? [];
+                          final messages = provider.chatAllMessageBetween ?? [];
 
                           if (messages.isEmpty) {
                             return const Center(
@@ -609,7 +604,7 @@ class _MessageScreenState extends State<MessageScreen> {
                                           ),
                                         ),
                                       ),
-                                     if(msg['content'] != null) chatBubble(
+                                    if(msg['content'] != null) chatBubble(
                                       message: msg['content'] == null ? "" :msg['content'],
                                       time: msg['created_at'],
                                       isMe: msg['isMe'],
@@ -624,200 +619,6 @@ class _MessageScreenState extends State<MessageScreen> {
                           );
                         },
                       ),
-                    ),
-                    Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.camera_alt,
-                                  color: Colors.grey),
-                              onPressed: () async{
-                                FilePickerResult? result =
-                                await FilePicker.platform.pickFiles(
-                                  allowMultiple: true,
-                                  type: FileType.any,
-                                );
-                                if (result != null) {
-                                  setModalState(() {
-                                    selectedFiles = result.files;
-                                  });
-                                }
-
-                              },
-                            ),
-
-                                Expanded(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (selectedFiles.isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                          child: Wrap(
-                                            spacing: 8,
-                                            runSpacing: 8,
-                                            children: selectedFiles.map((file) {
-                                              return Stack(
-                                                children: [
-                                                  ClipRRect(
-                                                    borderRadius: BorderRadius.circular(8),
-                                                    child: Image.file(
-                                                      File(file.path!),
-                                                      width: 80,
-                                                      height: 80,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    right: 0,
-                                                    top: 0,
-                                                    child: GestureDetector(
-                                                      onTap: () {
-                                                        log("Cique");
-                                                        setModalState(() {
-                                                          selectedFiles.removeWhere((f) => f.path == file.path);
-                                                        });
-                                                      },
-                                                      child: Container(
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.red,
-                                                          shape: BoxShape.circle,
-                                                        ),
-                                                        child: const Icon(
-                                                          Icons.close,
-                                                          color: Colors.white,
-                                                          size: 18,
-                                                        ),
-                                                      ),
-                                                    ),
-
-                                                  ),
-                                                ],
-                                              );
-                                            }).toList(),
-                                          ),
-                                        ),
-                                      TextField(
-                                      controller: controller,
-                                      decoration: InputDecoration(
-                                        hintText: 'Your message',
-                                        suffixIcon: IconButton(
-                                          icon: Icon(
-                                            Icons.send,
-                                            color:
-                                            isSending ? Colors.grey : Colors.blue,
-                                          ),
-                                          onPressed: isSending
-                                              ? null
-                                              : () async {
-                                            setState(() {
-                                              selectUser = false;
-                                            });
-                                            final content =
-                                            controller.text.trim();
-                                            if (content.isEmpty &&
-                                                selectedFiles.isEmpty) return;
-
-                                            setModalState(
-                                                    () => isSending = true);
-                                            List<PlatformFile> filesToSend ;
-                                            if(selectedFiles.isEmpty) {
-                                              filesToSend =
-                                              [];
-                                            } else  {
-                                              filesToSend =
-                                                  selectedFiles;
-                                            }
-
-                                            final success =
-                                            await chatProvider.sendMessage(
-                                                user['id'],
-                                                content,
-                                                files: filesToSend
-                                            );
-                                            final senderId =
-                                            Provider.of<AuthProvider>(
-                                                context,
-                                                listen: false)
-                                                .userMap!['user_id'];
-                                            Map<String, dynamic> message = {
-                                              'id': DateTime.now()
-                                                  .millisecondsSinceEpoch,
-                                              'sender_id': senderId,
-                                              'receiver_id': user['id'],
-                                              'content': content,
-                                              'is_read': 0,
-                                              'isDeleted': 0,
-                                              'created_at':
-                                              DateTime.now().toString(),
-                                              'updated_at':
-                                              DateTime.now().toString(),
-                                              'files' : filesToSend
-                                            };
-
-                                            if (success) {
-                                              setModalState(() {
-                                                controller.clear();
-                                                selectedFiles.clear();
-                                              });
-
-                                              await chatProvider
-                                                  .fetchChatMessage(user['id']);
-                                              Provider.of<AdminProvider>(context,
-                                                  listen: false)
-                                                  .reorderUserOnNewMessage(
-                                                  user['id'], message,
-                                                  sentByMe: true);
-                                            } else {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(chatProvider
-                                                      .error ??
-                                                      'Erreur lors de l\'envoi'),
-                                                ),
-                                              );
-                                            }
-
-                                            setModalState(
-                                                    () => isSending = false);
-                                          },
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                          borderSide: const BorderSide(
-                                            color: Color(0xFFADAFBB),
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                          borderSide: const BorderSide(
-                                            color: Color(0xFFADAFBB),
-                                            width: 2.0,
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                          borderSide: const BorderSide(
-                                            color: Color(0xFFADAFBB),
-                                            width: 0,
-                                          ),
-                                        ),
-                                        contentPadding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
-                                      ),
-                                                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                          ],
-                        )
                     ),
                   ],
                 ),
@@ -1047,8 +848,6 @@ class _MessageScreenState extends State<MessageScreen> {
     required String time,
     bool isOnline = false,
     bool isMe = false,
-    bool isRead = false,
-    int unreadCount = 0, // nouveau paramètre pour les messages non lus
   }) {
 
     return Column(
@@ -1089,7 +888,7 @@ class _MessageScreenState extends State<MessageScreen> {
             children: [
               Expanded(
                 child: Text(
-                  isMe ? "You: $lastMessage" : lastMessage,
+                  isMe ? "Lui: $lastMessage" : lastMessage,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.grey[600],
@@ -1100,15 +899,6 @@ class _MessageScreenState extends State<MessageScreen> {
                   ),
                 ),
               ),
-              if (isMe)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Icon(
-                    isRead ? Icons.done_all : Icons.done,
-                    size: 16,
-                    color: isRead ? Colors.blue : Colors.grey,
-                  ),
-                ),
             ],
           ),
           trailing: Column(
@@ -1121,24 +911,7 @@ class _MessageScreenState extends State<MessageScreen> {
                   fontSize: 12,
                 ),
               ),
-              if (unreadCount > 0)
-                Container(
-                  margin: const EdgeInsets.only(top: 4),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    unreadCount.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+
             ],
           ),
         ),

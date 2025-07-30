@@ -4,6 +4,7 @@ import 'package:ami_invisible_admin/providers/notification_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
 class NotificationUserScreen extends StatefulWidget {
   @override
   State<NotificationUserScreen> createState() => _NotificationUserScreenState();
